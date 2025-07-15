@@ -65,7 +65,7 @@ $contract_code = "00100/2023/DIGISIP/DIGINEXT";
 
 
 // $fecth_customers_billing_statement = "SELECT customer_code, customer_name  FROM customers WHERE status in ('actived', 'pending', 'liquidating');";
-$fecth_customers_billing_statement = "SELECT customer_code, customer_name  FROM customers WHERE customer_code in (SELECT customer_code from contracts_details WHERE status in ('actived', 'pending', 'liquidating'))";
+$fecth_customers_billing_statement = "SELECT customer_code, customer_name, email  FROM customers WHERE customer_code in (SELECT customer_code from contracts_details WHERE status in ('actived', 'pending', 'liquidating'))";
 $customers = get_data_by_sql('billing_140', $fecth_customers_billing_statement);
 
 $contract_customer_user_sql = "SELECT contracts.contract_code, contracts.customer_code, contracts.user_code, customers.customer_name, customers.tax_code, users.email, contracts.user_name
@@ -77,7 +77,7 @@ WHERE contracts.contract_code = '$contract_code'
 
 $contract_customer_user_result = get_data_by_sql('billing_140', $contract_customer_user_sql);
 
-var_dump($contract_customer_user_result);
+var_dump($customers);
 
 function send_mail($emailContact = array())
 {
