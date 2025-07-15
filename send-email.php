@@ -63,20 +63,25 @@ function get_data_by_sql($connection, $sql)
 
 $contract_code = "00100/2023/DIGISIP/DIGINEXT";
 
+
 $fecth_customers_billing_statement = "SELECT customer_code, customer_name  FROM customers WHERE status in ('actived', 'pending', 'liquidating');";
 $customers = get_data_by_sql('billing_140', $fecth_customers_billing_statement);
-$users_statements = "SELECT users.user_code, email FROM users INNER JOIN contracts on contracts.user_code = users.user_code WHERE contracts.contract_code = '$contract_code'";
-$contract_sql = "SELECT contract_code FROM contracts INNER JOIN customers on contracts.customer_code = customers.customer_code";
-$contract_code_result = get_data_by_sql('billing_140', $contract_sql);
-$users = get_data_by_sql('billing_140', $users_statements);
-var_dump($users);
 
+$contract_customer_user_sql = "SELECT contracts.contract_code, contracts.customer_code, contracts.user_code, customers.customer_name, customers.tax_code, users.email
+FROM contracts
+INNER JOIN customers ON contracts.customer_code = customers.customer_code
+INNER JOIN users ON contracts.user_code = users.user_code
+WHERE contracts.contract_code = '$contract_code'
+";
 
+$contract_customer_user_result = get_data_by_sql('billing_140', $contract_customer_user_sql);
+
+var_dump($contract_customer_user_result);
 
 function send_mail($emailContact = array())
 {
     foreach ($emailContact as $item) {
-        var_dump($item);
+        // var_dump($item);
         $mail = new PHPMailer(true);
         try {
             $mail->CharSet = 'UTF-8';
@@ -98,33 +103,33 @@ function send_mail($emailContact = array())
             $mail->Subject = 'DIGITEL - YÊU CẦU KHÁCH HÀNG CẬP NHẬT ĐỊA CHỈ XUẤT HÓA ĐƠN THEO QUY ĐỊNH MỚI VỀ ĐỊA BÀN HÀNH CHÍNH 2 CẤP';
 
             $mail->Body = '
-        <div style="font-family:Arial, Helvetica, sans-serif; font-size:15px; line-height:1.6; color:#000;">
-            <p><strong>Kính gửi Quý Khách hàng,</strong></p>
+            <div style="font-family:Arial, Helvetica, sans-serif; font-size:15px; line-height:1.6; color:#000;">
+                <p><strong>Kính gửi Quý Khách hàng ' . $item['customer_name'] . ' , </strong></p>
 
-            <p>Nhằm đảm bảo thông tin hóa đơn điện tử được cập nhật chính xác và phù hợp với quy định mới về địa bàn hành chính 2 cấp, chúng tôi trân trọng đề nghị Quý Khách hàng:</p>
+                <p>Nhằm đảm bảo thông tin hóa đơn điện tử được cập nhật chính xác và phù hợp với quy định mới về địa bàn hành chính 2 cấp, chúng tôi trân trọng đề nghị Quý Khách hàng:</p>
 
-            <p>Nếu doanh nghiệp của Quý vị đã được đồng bộ trên hệ thống hóa đơn điện tử theo địa bàn hành chính 2 cấp, vui lòng gửi email xác nhận để chúng tôi tiến hành cập nhật địa chỉ xuất hóa đơn trên hệ thống.</p>
+                <p>Nếu doanh nghiệp của Quý vị đã được đồng bộ trên hệ thống hóa đơn điện tử theo địa bàn hành chính 2 cấp, vui lòng gửi email xác nhận để chúng tôi tiến hành cập nhật địa chỉ xuất hóa đơn trên hệ thống.</p>
 
-            <p><strong>Thông tin xác nhận xin gửi về địa chỉ email:</strong><br>
-            
-            • ' . $item['email'] . '<br>
+                <p><strong>Thông tin xác nhận xin gửi về địa chỉ email:</strong><br>
+                
+                • ' . $item['email'] . '<br>
 
-            
+                
 
-            <p><strong>Nội dung email bao gồm:</strong><br>
-            • Tên doanh nghiệp:<br>
-            • Mã số thuế:<br>
-            • Địa chỉ xuất hóa đơn mới theo địa bàn hành chính 2 cấp<br>
-            • Công văn thông báo thay đổi địa chỉ mới của Quý Công Ty</p>
+                <p><strong>Nội dung email bao gồm:</strong><br>
+                • Tên doanh nghiệp: ' . $item['customer_name'] . ' <br>
+                • Mã số thuế: ' . $item['tax_code'] . '<br>
+                • Địa chỉ xuất hóa đơn mới theo địa bàn hành chính 2 cấp<br>
+                • Công văn thông báo thay đổi địa chỉ mới của Quý Công Ty</p>
 
-            <p>Việc cập nhật kịp thời sẽ giúp đảm bảo hóa đơn được phát hành đúng quy định và tránh phát sinh sai sót trong quá trình kê khai, hạch toán.</p>
+                <p>Việc cập nhật kịp thời sẽ giúp đảm bảo hóa đơn được phát hành đúng quy định và tránh phát sinh sai sót trong quá trình kê khai, hạch toán.</p>
 
-            <p>Chúng tôi rất mong nhận được sự phối hợp từ Quý Khách hàng.</p>
+                <p>Chúng tôi rất mong nhận được sự phối hợp từ Quý Khách hàng.</p>
 
-            <p><strong>Trân trọng cảm ơn!</strong></p>
+                <p><strong>Trân trọng cảm ơn!</strong></p>
 
-            <p><em>CÔNG TY CỔ PHẦN TẬP ĐOÀN DIGINEXT</em></p>
-        </div>';
+                <p><em>CÔNG TY CỔ PHẦN TẬP ĐOÀN DIGINEXT</em></p>
+            </div>';
 
             $mail->AltBody = 'Kính gửi Quý Khách hàng, vui lòng kiểm tra nội dung email bằng trình duyệt hỗ trợ HTML.';
 
@@ -137,4 +142,4 @@ function send_mail($emailContact = array())
     }
 }
 
-send_mail($users);
+send_mail($contract_customer_user_result);
