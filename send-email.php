@@ -61,7 +61,9 @@ function get_data_by_sql($connection, $sql)
 
 // get 
 
-$contract_code = "00100/2023/DIGISIP/DIGINEXT";
+// $contract_code = "00100/2023/DIGISIP/DIGINEXT";
+
+$customer_id = 'DG00000';
 
 
 // $fecth_customers_billing_statement = "SELECT customer_code, customer_name  FROM customers WHERE status in ('actived', 'pending', 'liquidating');";
@@ -76,12 +78,12 @@ $contract_customer_user_sql = "SELECT contracts.contract_code, contracts.custome
 FROM contracts
 INNER JOIN customers ON contracts.customer_code = customers.customer_code
 INNER JOIN users ON contracts.user_code = users.user_code
-WHERE contracts.contract_code = '$contract_code'
+WHERE customers.customer_code = '$customer_id' group by contracts.customer_code
 ";
 
 $contract_customer_user_result = get_data_by_sql('billing_140', $contract_customer_user_sql);
 
-// var_dump($contract_customer_user_result);
+var_dump($contract_customer_user_result);
 
 function send_mail($emailContact = array())
 {
@@ -102,7 +104,8 @@ function send_mail($emailContact = array())
 
             //Recipients
             $mail->setFrom('dothuylinh270802@gmail.com', 'Test send Mail');
-            $mail->addAddress($item['customerMail'], $item['customer_name']);     //Add a recipient
+            // $mail->addAddress($item['customerMail'], $item['customer_name']);     //Add a recipient
+            $mail->addAddress('dtlinh270802@gmail.com', 'Hima');     //Add a recipient
 
             //Content
             $mail->isHTML(true); // Set email format to HTML
@@ -134,7 +137,14 @@ function send_mail($emailContact = array())
 
                 <p><strong>Trân trọng cảm ơn!</strong></p>
 
-                <p><em>CÔNG TY CỔ PHẦN TẬP ĐOÀN DIGINEXT</em></p>
+                <div style="margin-top:30px; padding-top:20px; border-top:1px solid #ccc; font-size:13px; font-family: Arial, sans-serif; color:#444;">
+                    <p style="margin: 0; font-weight: bold;">CÔNG TY CỔ PHẦN TẬP ĐOÀN DIGINEXT</p>
+                    <p style="margin: 0;">Địa chỉ giao dịch: Lô OF03-19, Tầng 3 - Office, Vinhomes West Point, Đường Phạm Hùng, Phường Mễ Trì, Quận Nam Từ Liêm, Hà Nội.</p>
+                    <p style="margin: 0;">Tel: (024-028) 5555 1111 | 19005055</p>
+                    <p style="margin: 0;">Website: <a href="https://diginext.com.vn" style="color: #0066cc;">https://diginext.com.vn</a></p>
+                    <p style="margin: 0;">Email: <a href="mailto:cskh@diginext.com.vn" style="color: #0066cc;">cskh@diginext.com.vn</a></p>
+                </div>
+
             </div>';
 
             $mail->AltBody = 'Kính gửi Quý Khách hàng, vui lòng kiểm tra nội dung email bằng trình duyệt hỗ trợ HTML.';
